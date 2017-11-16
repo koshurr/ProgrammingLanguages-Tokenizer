@@ -10,12 +10,14 @@ int isOp(char c);
 int isSeparator(char c);
 int isKeyword(char* c);
 void callSymbolTable(int numOfTokens);
+void buildParseTree(int tokenSize);
 Token tokenizer();
 char *file;
 int i = 0;
 Token *tokens;
 SymbolTable symbolTable;
 HashTable* symbolTablesValues;
+Program program;
 
 
 char *readFile(char *fileName) {
@@ -55,6 +57,7 @@ int main() {
     }
     printf("num of tokens: %d\n", numOfTokens);
     callSymbolTable(numOfTokens);
+    buildParseTree(numOfTokens);
     return 0;
 }
 
@@ -313,7 +316,11 @@ void callSymbolTable(int numOfTokens){
         printf("Value: %s\n}", symbolTablesValues[h].value);
     }
 }
+void buildParseTree(int tokenSize){
+    for(int y = 0; y < tokenSize; y++){
 
+    }
+}
 
 
 

@@ -8,6 +8,10 @@
 #include "Tokenizer.h"
 
 typedef struct{
+
+}IDENT;
+
+typedef struct{
     int a;
     char op;
     int b;
@@ -15,12 +19,24 @@ typedef struct{
 }Expr;
 
 typedef struct{
-    char name[20];
-    Token t;
-    int isTerminal;
-    struct Node* parent;
-    struct Node* children;
-}Node;
+    IDENT identfier;
+    Expr expression;
+}Assign;
+
+typedef struct{
+    char* type;
+    Assign assign;
+}Declaration;
+
+typedef struct{
+    Declaration* declaration;
+}ListOfDeclarations;
+
+typedef struct{
+    ListOfDeclarations declarations;
+    //listof statements
+}Program;
+
 
 
 #endif //TOKENIZER_PARSETREE_H

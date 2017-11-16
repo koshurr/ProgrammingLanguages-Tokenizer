@@ -2,7 +2,6 @@ int test(){
     char c[50] = {"yakov stern"};
     int a=5;
     int b = 10;
-    bool b2 = TRUE;
     bool b3 = FALSE;
     int result = 0;
     for(int i = 0; i < 3; i++){
