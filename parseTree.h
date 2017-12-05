@@ -6,35 +6,76 @@
 #define TOKENIZER_PARSETREE_H
 
 #include "Tokenizer.h"
+typedef struct Statement Statement;
+typedef struct Statements Statements;
+typedef struct Expr Expr;
 
 typedef struct{
 
-}IDENT;
+}BoolExp;
 
 typedef struct{
-    int a;
+    char **idents;
+}Cin;
+
+typedef struct{
+    Expr* exprs;
+}Cout;
+
+typedef struct{
+    BoolExp boolExp;
+    Statement* statement;
+}While;
+
+typedef struct{//“if” “(" <exp> ")" <statement> ["else" <statement>]
+    Expr* exp;
+    Statements* stmnts;
+    Statements* elseStmnts;
+}If;
+
+typedef struct{
+    char* ret;
+}Return;
+
+struct Expr{
+    struct Expr* a;
+    char* value;
+    struct Expr* b;
+};
+
+typedef struct{
+    char* identfier;
     char op;
-    int b;
-    struct Expr* exp;
-}Expr;
-
-typedef struct{
-    IDENT identfier;
-    Expr expression;
+    struct Expr* expression;
 }Assign;
 
 typedef struct{
     char* type;
-    Assign assign;
+    char** variables;
 }Declaration;
 
 typedef struct{
-    Declaration* declaration;
-}ListOfDeclarations;
+    Declaration* decs;
+}Declarations;
+
+struct Statement{
+    int is;
+    char* type;
+    Cin cin;
+    Cout cout;
+    If inf;
+    Assign assign;
+    While whyle;
+    Return ret;
+};
+
+struct Statements{
+    Statement* statement;
+};
 
 typedef struct{
-    ListOfDeclarations declarations;
-    //listof statements
+    Declarations declarations;
+    Statements statements;
 }Program;
 
 

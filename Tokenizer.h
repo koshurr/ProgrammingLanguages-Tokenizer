@@ -12,6 +12,15 @@ typedef struct{
 typedef struct{
     char *name;
     char *value;
+    int address;
+    char *type;
+//    char *lifetime;
+//    char *scope;
+}Variable;
+
+typedef struct{
+    char *name;
+    char *value;
     char *attributes;
 }HashTable;
 
