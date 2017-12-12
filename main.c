@@ -24,15 +24,16 @@ void printStatements(Statements stmnts);
 Assign parseAssign();
 void printAssign(Assign as);
 //Expr parseExp();
-//Expr parseExp1();
-//Expr parseExp2();
+Expr* parseExp1();
+Expr* parseExp2();
 //Expr parseExp3();
 //Expr parseExp4();
 //Expr parseExp5();
-//Expr parseExp6();
+Expr* parseExp6();
 Expr* parseExp7();
 Expr* parseExp8();
-char* parseLit();
+void printExpr(Expr* ex);
+Expr* parseLit();
 Expr* parseLit2();
 char* parseID();
 Cout parseCout();
@@ -45,10 +46,22 @@ If parseIf();
 void printIf(If inf);
 Return parseReturn();
 void printReturn(Return ret);
-
-
-
+Expr* parseBoolExp();
+char *strdup(const char *str);
 Token tokenizer();
+void runInterpreter(Program program);
+void printSymbolTable();
+HashTable* getIdent(char *string);
+void evaluateExpr(Expr* ex);
+int isSymbol(char* str);
+char* getSymbolVal(char *str);
+void copyExpr(Expr* ex1,Expr* ex2);
+
+
+int evaluateBoolExp(Expr* exp);
+
+void copyAssign(Assign* a1,Assign* a2);
+
 char *file;
 int i = 0;
 Token *tokens;
@@ -56,6 +69,11 @@ int numOfTokens;
 SymbolTable symbolTable;
 HashTable* symbolTablesValues;
 
+char *strdup(const char *str) {
+    char *rv = malloc(strlen(str) + 1);
+    if (rv) strcpy(rv, str);
+    return rv;
+}
 
 char *readFile(char *fileName) {
     FILE *file = fopen(fileName, "r");
@@ -84,11 +102,12 @@ int main(){
     Program program;
     tokens = malloc(10000);
     //long input_file_size;
-    //"C://users//yakov//clionprojects//tokenizer//test.txt"
-    file = readFile("C:/home/test.txt");
+    file = readFile("C://users//yakov//clionprojects//tokenizer//test.txt");
 
-    symbolTable.hashTable = (HashTable*)malloc(sizeof(HashTable));
+    symbolTable.hashTable = (HashTable*)malloc(10 * sizeof(HashTable));
+    symbolTable.noOfElem = 0;
     symbolTablesValues = symbolTable.hashTable;
+
 
     printf("Tokens:\n[\n");
     while(T.tt != "EOFToken"){
@@ -102,8 +121,131 @@ int main(){
 
     program = parseProgram();
     printProgram(program);
+    printf("\nprint empty symbol table\n");
+    printSymbolTable();
+    printf("\nrun interpreter\n");
+    runInterpreter(program);
+    printf("\nprint final symbol table\n");
+    printSymbolTable();
 
     return 0;
+}
+
+void printSymbolTable() {
+    int count = symbolTable.noOfElem - 1;
+    printf("\n");
+    while(count >= 0){
+        printf("name: %s, value: %s\n",symbolTable.hashTable[count].name,symbolTable.hashTable[count].value);
+        count--;
+    }
+}
+
+void runInterpreter(Program program) {
+//symbol table has already been built so I skip program declarations
+    int num = 0;
+    while(program.statements.statement[num].is == 1){
+        Statement s = program.statements.statement[num];
+        if(strcmp(s.type,"cout")==0) {
+            int count = 0;
+            while(!strcmp(s.cout.exprs[count].value,"18killstreak") == 0){
+                evaluateExpr(&s.cout.exprs[count]);
+                if(isdigit(s.cout.exprs[count].value[0]) == 0 && s.cout.exprs[count].value[0] != '-'){
+                    int count2 = 0;
+                    while(count2 <= symbolTable.noOfElem - 1){
+                        if(strcmp(symbolTable.hashTable[count2].name, s.cout.exprs[count].value)==0){
+                            printf("cout >> %s\n",symbolTable.hashTable[count2].value);
+                            count++;
+                            break;
+                        }
+                        count++;
+                        count2++;
+                    }
+                }
+                else{
+                    printf("cout >> %s\n",s.cout.exprs[count].value);
+                    count++;
+                }
+            }
+        }
+        else if(strcmp(s.type,"cin")==0){
+            int count = 0;
+            while(s.cin.idents[count]){
+                //HashTable location = getIdent(s.cin.idents[count]);
+                char* temp = (char*)malloc(sizeof(char));
+                int j = symbolTable.noOfElem-1;
+                while(j >= 0){
+                    if(strcmp(symbolTable.hashTable[j].name,s.cin.idents[count]) == 0){
+                        if(strcmp(symbolTable.hashTable[j].attributes,"int")==0){
+                            printf("give an integer: ");
+                            int temp2;
+                            int result = scanf("%d",&temp2);
+                            symbolTable.hashTable[j].value = (char*)malloc(sizeof(char));
+                            itoa(temp2,symbolTable.hashTable[j].value,10);
+                            printf("your input was %s\n", symbolTable.hashTable[j].value);
+                        }
+                        else if(strcmp(symbolTable.hashTable[j].attributes,"char")==0){
+                            printf("give a character: ");
+                            scanf("%c",temp);
+                            symbolTable.hashTable[j].value = (char*)malloc(sizeof(char));
+                            symbolTable.hashTable[j].value = temp;
+                            printf("your input was %s\n", symbolTable.hashTable[j].value);
+                        }
+                    }
+                    j--;
+                }
+                count++;
+            }
+        }
+        else if(strcmp(s.type,"while")==0){
+            while(evaluateBoolExp(s.whyle.boolExp)){
+                Program newProgram;
+                newProgram.statements = *s.whyle.statements;
+                runInterpreter(newProgram);
+            }
+        }
+        else if(strcmp(s.type,"if")==0){
+            //not in the test file
+        }
+        else if(strcmp(s.type,"return")==0){
+            //since theres only one function (main) this doesnt do anything
+        }
+        else if(strcmp(s.type,"assign")==0){
+            int count = 0;
+            Assign* temp = (Assign*)malloc(sizeof(Assign));
+            copyAssign(&s.assign,temp);
+            evaluateExpr(temp->expression);
+            if(isdigit(temp->expression->value[0]) == 0 && temp->expression->value[0] != '-'){
+                int count2 = 0;
+                while(count2 <= symbolTable.noOfElem - 1){
+                    if(strcmp(symbolTable.hashTable[count2].name, temp->expression->value)==0){
+                        temp->expression->value = strdup(symbolTable.hashTable[count2].value);
+                        break;
+                    }
+                    count2++;
+                }
+            }
+            while(count <= symbolTable.noOfElem - 1){
+                if(strcmp(symbolTable.hashTable[count].name, temp->identfier)==0){
+                    symbolTable.hashTable[count].value = strdup(temp->expression->value);
+                }
+                count++;
+            }
+        }
+        num++;
+    }
+}
+
+HashTable* getIdent(char *string) {
+    int count = symbolTable.noOfElem - 1;
+    printf("\n");
+    while(count >= 0){
+        symbolTable.hashTable[count].value = "";
+        if(strcmp(symbolTable.hashTable[count].name, string)==0){
+            return &symbolTable.hashTable[count];
+        }
+        count--;
+    }
+    printf("No variable name %s, exists\n",string);
 }
 
 Program parseProgram() {
@@ -128,13 +270,19 @@ void printProgram(Program program){
 Declarations parseDeclarations(){
     Declarations decs = {.decs = (Declaration*)malloc(5 * sizeof(Declaration))};
     int numOfDecs,numOfVars;
+    char* decType;
     numOfDecs = 0;
     numOfVars = 0;
     while(strcmp(tokens[i].value,"int") == 0 || strcmp(tokens[i].tt,"char") == 0){
+        decType = tokens[i].value;
+        symbolTable.hashTable[symbolTable.noOfElem].attributes = decType;
         decs.decs[numOfDecs].type = tokens[i++].value;
         decs.decs[numOfDecs].variables = (char **)malloc(5 * sizeof(char*));
         while(strcmp(tokens[i].value,";") != 0){
             if(strcmp(tokens[i].tt,"IDENT") == 0){
+                symbolTable.hashTable[symbolTable.noOfElem].attributes = decType;
+                symbolTable.hashTable[symbolTable.noOfElem].value = "";
+                symbolTable.hashTable[symbolTable.noOfElem++].name = tokens[i].value;
                 decs.decs[numOfDecs].variables[numOfVars] = (char*)malloc(5 * sizeof(char));
                 decs.decs[numOfDecs].variables[numOfVars++] = tokens[i].value;
             }
@@ -179,12 +327,9 @@ Statements parseStatements(){
             stmnts.statement[numOfStmnts++].cin = parseCin();
         }
         else if(strcmp(tokens[i].value,"while")==0){
-            while(strcmp(tokens[i].value,"}") != 0){//move over
-                i++;
-            }
-            i++;
-//            stmnts.statement[numOfStmnts].type = "while";
-//            stmnts.statement[numOfStmnts++].whyle = parseWhile();
+            stmnts.statement[numOfStmnts].type = "while";
+            i++;//pass while
+            stmnts.statement[numOfStmnts++].whyle = parseWhile();
         }
         else if(strcmp(tokens[i].value,"if")==0){
             stmnts.statement[numOfStmnts].type = "if";
@@ -197,10 +342,12 @@ Statements parseStatements(){
         else if(strcmp(tokens[i].tt,"IDENT")==0){
             stmnts.statement[numOfStmnts].type = "assign";
             stmnts.statement[numOfStmnts++].assign = parseAssign();
+            i++;//pass ;
         }
         //numOfStmnts++;
+
     }
-    printf("yoyoyyoyoyoy%d",numOfStmnts);
+    printf("no of statements%d",numOfStmnts);
     return stmnts;
 }
 
@@ -215,10 +362,12 @@ void printStatements(Statements stmnts){
             printCin(s.cin);
         }
         else if(strcmp(s.type,"while")==0){
+            printWhile(s.whyle);
         }
         else if(strcmp(s.type,"if")==0){
         }
         else if(strcmp(s.type,"return")==0){
+            printReturn(s.ret);
         }
         else if(strcmp(s.type,"assign")==0){
             printAssign(s.assign);
@@ -238,7 +387,6 @@ Assign parseAssign(){
     }
 
     exp = parseExp7();
-
     res.identfier = id;
     res.op = op;
     res.expression = exp;
@@ -254,218 +402,202 @@ void printAssign(Assign as){
     printExpr(as.expression);
 }
 
-Expr* buildExp(Expr* a, char* c, Expr* b){
-    //Expr ex = {.a = a, .value = c,.b = b};
-    Expr* ex1 = (Expr *)malloc(sizeof(Expr));
-//    Expr* ex2 = (Expr *)malloc(sizeof(Expr));
-    ex1->value = c;
-    ex1->a = a;
-    ex1->b = b;
-//
-//    exp.a = ex1->a;
-//    exp.b = ex1->b;
-//    exp.value = ex1->value;
-    return ex1;
-}
-
-//void printExpr(Expr* ex){//prints in preorder
-//    if(!ex){
-//        return;
-//    }
-//    printf("\n%s",ex->value);
-//    printExpr(ex->a);
-//    printExpr(ex->b);
-//}
-
-void printExpr(Expr* ex) {//prints in preorder
+void printExpr(Expr* ex){//prints in preorder
+    //!*ex->a->value ||
+    if(strcmp(ex->value,"18killstreak") == 0){
+        return;
+    }
     printf("\n%s",ex->value);
-    if(ex->a->value){
-        printExpr(ex->a);
-    }
-    if(ex->b->value){
-        printExpr(ex->b);
-    }
+
+    printExpr(ex->a);
+    printExpr(ex->b);
 }
 
-void prepExpr(Expr* ex){
-    ex->a = (Expr*)malloc(sizeof(Expr));
-    ex->b = (Expr*)malloc(sizeof(Expr));
-    ex->a->a = (Expr*)malloc(sizeof(Expr));
-    ex->b->a = (Expr*)malloc(sizeof(Expr));
-    ex->a->b = (Expr*)malloc(sizeof(Expr));
-    ex->b->b = (Expr*)malloc(sizeof(Expr));
-
-//    ex->a = 0;
-//    ex->b = 0;
-    ex->a->value = 0;
-    ex->b->value = 0;
-    ex->a->a->value = 0;
-    ex->b->a->value = 0;
-    ex->a->b->value = 0;
-    ex->b->b->value = 0;
+Expr* initExp(){
+    Expr* ret;
+    ret = (Expr*)malloc(sizeof(Expr));
+    ret->a = (Expr*)malloc(sizeof(Expr));
+    ret->b = (Expr*)malloc(sizeof(Expr));
+    ret->value = (char*)malloc(sizeof(char));
+    ret->value = strdup("18killstreak");
+    ret->a->value = strdup("18killstreak");
+    ret->b->value = strdup("18killstreak");
+    return ret;
 }
 
 //Expr parseExp3();
 //Expr parseExp4();
 //Expr parseExp5();
-//Expr parseExp6();
-//
-//
-//void copy_string(char *target, char *source) {
-//    int k = 0;
-//    target = (char*)malloc(sizeof(char));
-//    while(source[k])
-//    {
-//        target[k] = source[k];
-//        k++;
-//    }
-//    target[k] = '\0';
-//}
-//
-//Expr* parseExp7(){
-//    Expr* ret = initExp();
-//    Expr* temp = initExp();
-//    ret->a = parseExp8();
-//    *temp->a = *ret->a;
-//    while(strcmp(tokens[i].value,"+") == 0 || strcmp(tokens[i].value,"-") == 0){
-//        ret->value = tokens[i++].value;
-//        copy_string(temp->value,ret->value);
-//        *temp->b = *ret->b;
-//        if(!strcmp(tokens[i].value,"+") != 0 && !strcmp(tokens[i].value,"-") != 0){
-//            *temp->a = *temp;
-//            temp->value = (char*)malloc(sizeof(char));
-//            temp->b = (Expr*)malloc(sizeof(Expr));
-//            ret = initExp();
-//        }else{
-//            printf("hi");
-//            printExpr(temp);
-//            return temp;
-//        }
-//    }
-//
-//    if(strcmp(ret->value,"18killstreak") == 0){
-//        ret = ret->a;
-//        return ret;
-//    }else{
-//        ret = temp;
-//    }
-//    //printExpr(ret);
-//    return ret;
-//}
-//
-//Expr* parseExp8(){
-//    Expr* ret = initExp();
-//    Expr* temp = initExp();
-//
-//    ret->a->value = parseLit();
-//
-//    while(strcmp(tokens[i].value,"*") == 0 || strcmp(tokens[i].value,"/") == 0) {
-//        ret->value = tokens[i++].value;
-//        ret->b->value = parseLit();
-//        if (!strcmp(tokens[i].value,"*") != 0 && !strcmp(tokens[i].value,"/") != 0) {
-//            if (strcmp(temp->value, "18killstreak") == 0) {
-//                temp = ret;
-//            } else {
-//                ret->a = temp;
-//                temp = ret;
-//            }
-//            ret = initExp();
-//        }else{
-//            return ret;
-//        }
-//    }
-//    if(strcmp(ret->value,"18killstreak") == 0){
-//        ret = ret->a;
-//        return ret;
-//    }else{
-//        ret = temp;
-//    }
-//    return ret;
-//}
-//
-//
-//
-//
+
+Expr* parseExp1(){
+    char* tempVal;
+    Expr* tempB;
+    Expr* temp2;
+    Expr* ret = initExp();
+    ret->a = parseExp2();
+    while(strcmp(tokens[i].value,"||") == 0){
+        tempVal = tokens[i++].value;
+        tempB = parseExp2();
+        if(strcmp(ret->value,"18killstreak") == 0){
+            ret->value = tempVal;
+            ret->b = tempB;
+        }else{
+            temp2 = initExp();
+            temp2->a = ret;
+            temp2->value = tempVal;
+            temp2->b = tempB;
+            ret = temp2;
+        }
+    }
+
+    if(strcmp(ret->value,"18killstreak") == 0){
+        ret = ret->a;
+        return ret;
+    }
+//    printf("%d\n",i);
+//    printExpr(ret);
+    return ret;
+}
+
+Expr* parseExp2(){
+    char* tempVal;
+    Expr* tempB;
+    Expr* temp2;
+    Expr* ret = initExp();
+    ret->a = parseExp6();
+    while(strcmp(tokens[i].value,"&&") == 0){
+        tempVal = tokens[i++].value;
+        tempB = parseExp6();
+        if(strcmp(ret->value,"18killstreak") == 0){
+            ret->value = tempVal;
+            ret->b = tempB;
+        }else{
+            temp2 = initExp();
+            temp2->a = ret;
+            temp2->value = tempVal;
+            temp2->b = tempB;
+            ret = temp2;
+        }
+    }
+
+    if(strcmp(ret->value,"18killstreak") == 0){
+        ret = ret->a;
+        return ret;
+    }
+//    printf("%d\n",i);
+//    printExpr(ret);
+    return ret;
+}
+
+Expr* parseExp6(){
+    char* tempVal;
+    Expr* tempB;
+    Expr* temp2;
+    Expr* ret = initExp();
+    ret->a = parseExp7();
+    while(strcmp(tokens[i].value,">") == 0 || strcmp(tokens[i].value,"<") == 0 || strcmp(tokens[i].value,">=") == 0 ||
+            strcmp(tokens[i].value,"<=") == 0){
+        tempVal = tokens[i++].value;
+        tempB = parseExp7();
+        if(strcmp(ret->value,"18killstreak") == 0){
+            ret->value = tempVal;
+            ret->b = tempB;
+        }else{
+            temp2 = initExp();
+            temp2->a = ret;
+            temp2->value = tempVal;
+            temp2->b = tempB;
+            ret = temp2;
+        }
+    }
+
+    if(strcmp(ret->value,"18killstreak") == 0){
+        ret = ret->a;
+        return ret;
+    }
+//    printf("%d\n",i);
+//    printExpr(ret);
+    return ret;
+}
 
 Expr* parseExp7(){
-    Expr *res = (Expr *)malloc(sizeof(Expr));
-    prepExpr(res);
-    res->a = parseExp8();
-    res->value = "18killstreak";
-    Expr* ex1 = NULL;
+    char* tempVal;
+    Expr* tempB;
+    Expr* temp2;
+    Expr* ret = initExp();
+    ret->a = parseExp8();
     while(strcmp(tokens[i].value,"+") == 0 || strcmp(tokens[i].value,"-") == 0){
-        res->value = tokens[i++].value;
-        res->b = parseExp8();
-        if(ex1 == NULL){
-            ex1 = res;
+        tempVal = tokens[i++].value;
+        tempB = parseExp8();
+        if(strcmp(ret->value,"18killstreak") == 0){
+            ret->value = tempVal;
+            ret->b = tempB;
         }else{
-            ex1 = buildExp(ex1,res->value,res->b);
+            temp2 = initExp();
+            temp2->a = ret;
+            temp2->value = tempVal;
+            temp2->b = tempB;
+            ret = temp2;
         }
-        res = (Expr*)malloc(sizeof(Expr));
-        prepExpr(res);
     }
 
-    if(strcmp(tokens[i].value,";")==0){
-        i++;
+    if(strcmp(ret->value,"18killstreak") == 0){
+        ret = ret->a;
+        return ret;
     }
 
-    if(ex1 == NULL){
-        Expr* ex = res->a;
-        return ex;
-    }
-
-    return ex1;
+    return ret;
 }
 
 Expr* parseExp8(){
-    Expr* res = (Expr *)malloc(sizeof(Expr));
-    prepExpr(res);
-    Expr* ex1 = NULL;
+    char* tempVal;
+    Expr* tempB;
+    Expr* temp2;
+    Expr* ret = initExp();
 
-    if(strcmp(tokens[i].tt,"SEPARATOR")==0){
-        res->a = parseLit2()->a;
+    if(strcmp(tokens[i].value,"(")==0){
+        ret->a = parseLit2();
     }else{
-        res->a->value = parseLit();
+        ret->a = parseLit();
+    }
+    while(strcmp(tokens[i].value,"*") == 0 || strcmp(tokens[i].value,"/") == 0 || strcmp(tokens[i].value,"%") == 0) {
+        tempVal = tokens[i++].value;
+        if(strcmp(tokens[i].value,"(")==0){
+            tempB = parseLit2();
+        }else{
+            tempB = parseLit();
+        }
+        if(strcmp(ret->value,"18killstreak") == 0){
+            ret->value = tempVal;
+            ret->b = tempB;
+        }else{
+            temp2 = initExp();
+            temp2->a = ret;
+            temp2->value = tempVal;
+            temp2->b = tempB;
+            ret = temp2;
+        }
+    }
+    if(strcmp(ret->value,"18killstreak") == 0){
+        //Expr* temp2 = initExp();
+        //free(temp2->value);
+        //temp2->value = strdup(ret->a->value);
+        return ret->a;
     }
 
-    while(strcmp(tokens[i].value,"*") == 0 || strcmp(tokens[i].value,"/") == 0){
-        res->value = tokens[i++].value;
-
-        if(strcmp(tokens[i].tt,"SEPARATOR")==0){
-            res->b = parseLit2()->a;
-        }else{
-            res->b->value = parseLit();
-        }
-        if(ex1 == NULL){
-            ex1 = res;
-        }else{
-            ex1 = buildExp(ex1,res->value,res->b);
-        }
-        res = (Expr*)malloc(sizeof(Expr));
-        prepExpr(res);
-    }
-    if(ex1 == NULL){
-        res->value = res->a->value;
-        res->a->value = 0;
-        return res;
-    }
-    return ex1;
+    return ret;
 }
 
-//Expr parseExp9(){
-//
-//}
-
-char* parseLit(){
-    char* ret = (char *)malloc(sizeof(char));
+Expr* parseLit(){
+    Expr* ret = initExp();
     if(strcmp(tokens[i].tt,"INTEGER")==0){
-        ret = tokens[i++].value;
+        ret->value = tokens[i++].value;
     }
     else if(strcmp(tokens[i].tt,"CHAR")==0){
-        ret = tokens[i++].value;
+        ret->value = tokens[i++].value;
     }
     else if(strcmp(tokens[i].tt,"IDENT")==0){
-        ret = parseID();
+        ret->value = parseID();
     }
     return ret;
 }
@@ -473,13 +605,13 @@ char* parseLit(){
 Expr* parseLit2(){
     Expr* ret = (Expr *)malloc(sizeof(Expr));
     //prepExpr(ret);
-    if(strcmp(tokens[i].value,"(")==0 || strcmp(tokens[i].value,")")==0){
+    if(strcmp(tokens[i].value,"(")==0){
         i++;
-        Expr* ex = parseExp7();
+        Expr* ex = parseExp1();
         ret->a = ex;
         i++;
     }
-    return ret;
+    return ret->a;
 }
 
 char* parseID(){
@@ -742,108 +874,6 @@ int isKeyword(char* c){
     return 0;
 }
 
-void callSymbolTable(){
-    int size = 0;
-    int j = 0;
-    int k = 0;
-    for( j ; j < numOfTokens ; j++ ){
-        size = symbolTable.noOfElem;
-        if(strcmp(tokens[j].tt,"CONST") == 0 || strcmp(tokens[j].tt,"IDENT") == 0){
-            if(strcmp(tokens[j].tt,"OPERATOR") == 0){
-                if(strcmp(tokens[j].tt,"CONST") == 0 || strcmp(tokens[j].tt,"IDENT") == 0){
-                    //expression;
-                }
-            }
-        }
-        if(strcmp(tokens[j].value,"int") == 0 || strcmp(tokens[j].value,"float") == 0
-           || strcmp(tokens[j].value,"char") == 0){
-            if(strcmp(tokens[j+1].tt,"IDENT") == 0){
-                if(strcmp(tokens[j+2].value,"=")==0){
-                    if(strcmp(tokens[j+3].tt,"BADTOKEN") != 0){
-                        symbolTablesValues =
-                                (HashTable*)realloc(symbolTablesValues, (symbolTable.noOfElem+1) * sizeof(HashTable));
-                        symbolTablesValues[size].attributes = tokens[j].value;
-                        symbolTablesValues[size].name = tokens[j+1].value;
-                        symbolTablesValues[size].value = tokens[j+3].value;
-                        symbolTable.noOfElem++;
-                        j += 3;
-                    }
-                }
-            }
-        }
-        if(strcmp(tokens[j].tt,"KEYWORD") == 0 ){
-            if(strcmp(tokens[j+1].tt,"IDENT") == 0){
-                if(strcmp(tokens[j+2].value,"[") == 0){
-                    if(strcmp(tokens[j+3].tt,"INTEGER") == 0 && strcmp(tokens[j+4].value,"]") == 0){
-                        if(strcmp(tokens[j+5].value,"=")==0){
-                            symbolTablesValues =
-                                    (HashTable*)realloc(symbolTablesValues, (symbolTable.noOfElem+1) * sizeof(HashTable));
-                            symbolTablesValues[size].attributes = tokens[j].value;
-                            symbolTablesValues[size].name = tokens[j+1].value;
-                            j += 5;
-                            if(strcmp(tokens[j+1].value,"{") == 0){
-                                j += 1;
-                                if(strcmp(tokens[j-6].value,"char") == 0 && strcmp(tokens[j+1].tt,"STRING") == 0){
-                                    j += 1;
-                                    symbolTablesValues[size].value = tokens[j].value;
-                                    printf("jello%s",tokens[j].value);
-                                }
-                                else{
-                                    while(strcmp(tokens[j+1].tt,toUpper(tokens[j-5].value)) == 0){
-                                        break;
-                                    }
-                                }
-                                symbolTable.noOfElem++;
-                            }
-//                            if(strcmp(tokens[j+7].tt,"BADTOKEN") != 0){
-//
-//                                symbolTablesValues[size].value = tokens[j+7].value;
-//                                symbolTable.noOfElem++;
-//                                j += 7;
-//                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-    printf("\nSymbol Table:\n[\n");
-    for(int h = 0; h < size; h++){
-        printf("\t{ Attribute: %5s\t", symbolTablesValues[h].attributes);
-        printf("Name: %7s\t", symbolTablesValues[h].name);
-        printf("Value: %10s }\n", symbolTablesValues[h].value);
-    }
-    printf("]\n");
-    printf("Number of Elements %d\n\n",size);
-}
-
-char* furst(){//return name of nonterminal which corresponds to the token on deck
-    char* returnString = malloc(64);
-    char* tokT = tokens[i].tt;
-//    switch(tokT){
-//        case "KEYWORD":
-//        //    returnString = furstKeyword();
-//        case "IDENT":
-//        case "INTEGER":
-//        case "FLOAT":
-//        case "STRING":
-//        case "CHAR":
-//        case "RELOP":
-//        case "UOP":
-//        default:
-//    }
-    return returnString;
-}
-
-char* toUpper(char* str){
-    int k = 0;
-    while(str[k] != '\0'){
-        str[k] = (char) toupper((unsigned char) str[k]);
-        k++;
-    }
-    return str;
-}
-
 Cout parseCout(){
     Cout c;
     int noOfExprs = 0;
@@ -853,18 +883,22 @@ Cout parseCout(){
             i++;
             continue;
         }
-        if(strcmp(tokens[i].tt,"IDENT") == 0 || strcmp(tokens[i].tt,"INTEGER") == 0){
+        if(strcmp(tokens[i].tt,"IDENT") == 0){
             c.exprs[noOfExprs++] = *parseExp7();
-//            printf("yo look hr\n");
-//            printExpr(&c.exprs[noOfExprs-1]);
             if(strcmp(tokens[--i].value,";")==0){
-                //i++;
+                i++;
                 break;
             }
+
+        }
+        else if(strcmp(tokens[i].value,",")==0){
+            i++;
+            continue;
         }
         else{
             printf("\nerror in syntax with token %d\n",i);
         }
+        c.exprs[noOfExprs] = *initExp();
         i++;
     }
     //printf("%d,%s",i,tokens[i].value);
@@ -874,12 +908,11 @@ Cout parseCout(){
 }
 
 void printCout(Cout c){
-    printf("\n\ncout ");
+    printf("\ncout ");
     int count = 0;
-    while(c.exprs[count].value){
-        printf(">> expression");
+    while(!strcmp(c.exprs[count].value,"18killstreak") == 0){
+        printf(">> expression\n");
         printExpr(&c.exprs[count++]);
-        printf("\n\n");
     }
 }
 
@@ -908,12 +941,18 @@ void printCin(Cin c){
 
 While parseWhile(){
     While w;
-    w.statement = (Statement*)malloc(sizeof(Statement));
+    w.boolExp = parseExp1();
+     w.statements = (Statements*)malloc(sizeof(Statements));
+    i++;//pass the {
+    *w.statements = parseStatements();
+    i++;//pass the }
     return w;
 }
 
 void printWhile(While whyle){
-
+    printf("here in print while");
+    printExpr(whyle.boolExp);
+    printStatements(*whyle.statements);
 }
 
 If parseIf(){
@@ -944,4 +983,110 @@ Return parseReturn(){
 
 void printReturn(Return ret){
     printf("\nreturn %s",ret.ret);
+}
+
+void evaluateExpr(Expr* ex){
+    if(strcmp(ex->value,"18killstreak") == 0){
+        return;
+    }
+    evaluateExpr(ex->a);
+    evaluateExpr(ex->b);
+    int a,b;
+    if(!strcmp(ex->a->value,"18killstreak") == 0 && !strcmp(ex->b->value,"18killstreak") == 0){
+        a = atoi(ex->a->value);
+        b = atoi(ex->b->value);
+        if(isdigit(ex->a->value[0]) == 0){
+            if(isSymbol(ex->a->value)){
+                a = atoi(getSymbolVal(ex->a->value));
+            }
+        }
+        if(isdigit(ex->b->value[0]) == 0){
+            if(isSymbol(ex->b->value)){
+                b = atoi(getSymbolVal(ex->b->value));
+            }
+        }
+        if(strcmp(ex->value,"+") == 0){
+            strdup(itoa(a+b,ex->value,10));
+        }
+        if(strcmp(ex->value,"-") == 0){
+            strdup(itoa(a-b,ex->value,10));
+        }
+        if(strcmp(ex->value,"&&") == 0){
+            strdup(itoa(a&&b,ex->value,10));
+        }
+        if(strcmp(ex->value,"||") == 0){
+            strdup(itoa(a||b,ex->value,10));
+        }
+        if(strcmp(ex->value,"*") == 0){
+            strdup(itoa(a*b,ex->value,10));
+        }
+        if(strcmp(ex->value,"/") == 0){
+            strdup(itoa(a/b,ex->value,10));
+        }
+        if(strcmp(ex->value,"%") == 0){
+            strdup(itoa(a%b,ex->value,10));
+        }
+        if(strcmp(ex->value,">") == 0){
+            strdup(itoa(a>b,ex->value,10));
+        }
+        if(strcmp(ex->value,">=") == 0){
+            strdup(itoa(a>=b,ex->value,10));
+        }
+        if(strcmp(ex->value,"<") == 0){
+            strdup(itoa(a<b,ex->value,10));
+        }
+        if(strcmp(ex->value,"<=") == 0){
+            strdup(itoa(a<=b,ex->value,10));
+        }
+    }
+}
+
+int evaluateBoolExp(Expr* exp){
+    Expr* ex = initExp();
+    copyExpr(exp, ex);
+    evaluateExpr(ex);
+    if(atoi(ex->value)){
+        return 1;
+    }
+    return 0;
+}
+
+void copyExpr(Expr* ex1,Expr* ex2){
+    if(strcmp(ex1->value,"18killstreak") == 0){
+        return;
+    }
+    ex2->value = strdup(ex1->value);
+    ex2->a = initExp();
+    ex2->b = initExp();
+    copyExpr(ex1->a,ex2->a);
+    copyExpr(ex1->b,ex2->b);
+}
+
+void copyAssign(Assign* a1,Assign* a2){
+    a2->op = a1->op;
+    a2->identfier = a1->identfier;
+    a2->expression = initExp();
+    copyExpr(a1->expression,a2->expression);
+}
+
+int isSymbol(char *str) {
+    int j = symbolTable.noOfElem - 1;
+    while(j >= 0){
+        if(strcmp(symbolTable.hashTable[j].name,str) == 0){
+            return 1;
+        }
+        j--;
+    }
+    return 0;
+}
+
+char* getSymbolVal(char *str) {
+    int j = symbolTable.noOfElem - 1;
+    while(j >= 0){
+        if(strcmp(symbolTable.hashTable[j].name,str) == 0){
+            char* ret = strdup(symbolTable.hashTable[j].value);
+            return ret;
+        }
+        j--;
+    }
 }

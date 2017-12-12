@@ -10,9 +10,6 @@ typedef struct Statement Statement;
 typedef struct Statements Statements;
 typedef struct Expr Expr;
 
-typedef struct{
-
-}BoolExp;
 
 typedef struct{
     char **idents;
@@ -23,8 +20,8 @@ typedef struct{
 }Cout;
 
 typedef struct{
-    BoolExp boolExp;
-    Statement* statement;
+    Expr* boolExp;
+    Statements* statements;
 }While;
 
 typedef struct{//“if” “(" <exp> ")" <statement> ["else" <statement>]
@@ -59,7 +56,7 @@ typedef struct{
 }Declarations;
 
 struct Statement{
-    int is;
+    int is; // initialized flag
     char* type;
     Cin cin;
     Cout cout;

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="c8fa0d3c-2046-40a0-9408-6f9205b5cc5a" name="jstern6@ycfac197.mc.yu.edu" url="http://ycfac197.mc.yu.edu">
+        <fileTransfer host="ycfac197.mc.yu.edu" port="8022" rootFolder="/home/jstern6" accessType="SFTP">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" />
+          </advancedOptions>
+          <option name="port" value="8022" />
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
