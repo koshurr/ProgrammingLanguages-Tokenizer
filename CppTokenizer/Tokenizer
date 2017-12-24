@@ -1,0 +1,286 @@
+#include <iostream>
+#include <string>
+#include <fstream>
+#include <streambuf>
+using namespace std;
+
+typedef struct {
+	string tt;
+	string value;
+}Token;	
+
+Token tokenizer(string file);
+int isKeyword(string s);
+int isSeparator(char c);
+int isUop(char c);
+int isRelop(char c);
+int isAriop(char c);
+
+int l;
+
+int main(){
+	string s = "";
+	
+	ifstream t("test.txt");
+    string str((istreambuf_iterator<char>(t)),
+                istreambuf_iterator<char>());
+	
+	l = 0;
+	while(l<str.length()){
+		Token t = tokenizer(str);
+		cout << t.tt << " : " << t.value << endl;
+	}
+	
+	return 0;
+}
+
+Token tokenizer(string file){
+	int strCount = 0;
+    char c;
+    string str;
+    int j = 1;
+    int state = 0;
+    int substate = 0;
+    Token T;
+	T.value;
+    while(file[l] != '\0'){
+		//cout<< l<<":"<< file[l]<<":"<< state<<endl;
+		char c = file[l];
+        l+=1;
+        if(state == 1){
+            if(substate == 1){
+                if(c == '\n'){
+                    str = str + '\0';
+                    T.value = str;
+                    return T;
+                }
+                str = str + c;
+                continue;
+            }
+            else if(substate == 2){
+                if(c == '*' && file[j] == '/'){
+                    str = str + c;
+                    str = str + file[l++];
+                    str = str + '\0';
+                    T.tt = "OLDCOMMENT";
+                    T.value = str;
+                    return T;
+                }
+                str = str + c;
+                continue;
+            }
+
+            if(c == '/' && substate == 0){
+                substate = 1;
+                str = str + c;
+                continue;
+            }
+            else if(c == '*' && substate == 0){
+                substate = 2;
+                str = str + c;
+                continue;
+            }
+            str = str + '\0';
+            T.tt = "RELOP";
+            T.value = str;
+            l--;
+            return T;
+        }
+        if(state == 2){
+            if(!isdigit(c) && !isalpha(c)){
+                if(isKeyword(str)==1){
+                    T.tt = "KEYWORD";
+                    T.value = str;
+                    l--;
+                    return T;
+                }
+                if(str.compare("TRUE")==0 || str.compare("FALSE")==0){
+                    T.tt = "BOOL";
+                    T.value = str;
+                    l--;
+                    return T;
+                }
+                T.value = str;
+                l--;
+                return T;
+            }
+            str = str + c;
+            continue;
+        }
+        if(state == 3){
+            if(c == '.' && substate == 0){
+                T.tt = "FLOAT";
+                substate = 1;
+                str = str + c;
+                continue;
+            }
+            if(c == '.' && substate == 1){
+                T.tt = "BADTOKEN";
+                str = str + c;
+                continue;
+            }
+            if(isdigit(c)){
+                str = str + c;
+                continue;
+            }
+            else{
+                l--;
+                str = str + '\0';
+                T.value = str;
+                return T;
+            }
+        }
+        if(state == 4){
+            if(c == '\''){
+                str = str + c;
+                str = str + '\0';
+                T.value = str;
+                return T;
+            }
+            str = str + c;
+            continue;
+        }
+        if(state == 5){
+            if(c == '"'){
+                str = str + c;
+                str = str + '\0';
+                T.value = str;
+                return T;
+            }
+            str = str + c;
+            continue;
+        }
+        if(c == '#' || state == 99){
+            if(state == 0){
+                T.tt = "HEADER";
+                state = 99;
+            }
+            if(c == '\n'){
+                T.value = str;
+                return T;
+            }
+            str = str + c;
+            continue;
+        }
+        if(isalpha(c)){
+            state = 2;
+            str = str + c;
+            T.tt = "IDENT";
+            continue;
+        }
+        if(isdigit(c)){
+            state = 3;
+            str = str + c;
+            T.tt = "INTEGER";
+            continue;
+        }
+        if(c == '/'){
+            T.tt = "LINECOMMENT";
+            state = 1;
+            str = str + c;
+            continue;
+        }
+        if(c == ' ' || c == '\n' || c == '\t'){
+            continue;
+        }
+        if(c == '\''){
+            state = 4;
+            T.tt = "CHAR";
+            str = str + c;
+            continue;
+        }
+        if(c == '"'){
+            state = 5;
+            T.tt = "STRING";
+            str = str + c;
+            continue;
+        }
+        if(isUop(c) == 1){
+            str = str + c;
+            T.tt = "UOP";
+            str = str + '\0';
+            T.value = str;
+            return T;
+        }
+        if(isRelop(c) == 1){
+            str = str + c;
+            T.tt = "RELOP";
+            str = str + '\0';
+            T.value = str;
+            return T;
+        }
+        if(isAriop(c) == 1){
+            str = str + c;
+            T.tt = "ARIOP";
+            str = str + '\0';
+            T.value = str;
+            return T;
+        }
+        if(isSeparator(c) == 1){
+            str = str + c;
+            T.tt = "SEPARATOR";
+            str = str + '\0';
+            T.value = str;
+            return T;
+        }
+
+    }
+    T.tt = "EOFToken";
+    //str = str + '\0';
+    T.value = "EOFToken";
+    return T;
+}	
+
+int isKeyword(string s){
+	string keywords[36]={"auto", "double", "int", "struct", "const", "float",
+                        "short", "unsigned", "break", "else", "long", "switch",
+                        "continue", "for", "signed", "void", "case", "enum",
+                        "register", "typedef", "default", "goto", "sizeof", "volatile",
+                        "char", "extern", "return", "union", "do", "if", "static",
+                        "while", "cin", "cout", "bool", "endl"};
+
+    for(int i = 0; i < 36;i++){
+        if(s.compare(keywords[i]) == 0){
+            return 1;
+        }
+    }
+    return 0;
+}	
+
+int isSeparator(char c){
+	int a = (int) c;
+    if( a == 123 || a == 125 || a == 91 || a == 93 || a == 59 || a == 44 || a == 40 || a == 41){
+        return 1;
+    }
+    return 0;
+}	
+int isUop(char c){
+	int a = (int) c;
+    if( a == 33 || a == 45 || a == 126){
+        return 1;
+    }
+    return 0;
+}	
+int isRelop(char c){
+	int a = (int) c;
+    if( a == 124 ){
+        return 1;
+    }
+    if( a == 92 || a == 94){
+        return 1;
+    }
+    if( a >= 34 && a <= 47 && a != 40 && a != 41 && a != 44){
+        return 1;
+    }
+    if( a >= 58 && a <= 64 && a != 59){
+        return 1;
+    }
+    return 0;
+}
+int isAriop(char c){
+	int a = (int) c;
+    if(a == 33 || a == 37 || a == 42 || a == 43 || a == 45 || a == 47 || a == 126){
+        return 1;
+    }
+    return 0;
+}	
