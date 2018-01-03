@@ -42,10 +42,10 @@ RM = "C:\Program Files\JetBrains\CLion 2017.2.2\bin\cmake\bin\cmake.exe" -E remo
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = C:\Users\yakov\CLionProjects\Tokenizer
+CMAKE_SOURCE_DIR = C:\Users\yakov\Desktop\ProgrammingLanguages-Tokenizer
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = C:\Users\yakov\CLionProjects\Tokenizer\cmake-build-debug
+CMAKE_BINARY_DIR = C:\Users\yakov\Desktop\ProgrammingLanguages-Tokenizer\cmake-build-debug
 
 # Include any dependencies generated for this target.
 include CMakeFiles/Tokenizer.dir/depend.make
@@ -58,16 +58,16 @@ include CMakeFiles/Tokenizer.dir/flags.make
 
 CMakeFiles/Tokenizer.dir/main.c.obj: CMakeFiles/Tokenizer.dir/flags.make
 CMakeFiles/Tokenizer.dir/main.c.obj: ../main.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=C:\Users\yakov\CLionProjects\Tokenizer\cmake-build-debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/Tokenizer.dir/main.c.obj"
-	C:\MinGW\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles\Tokenizer.dir\main.c.obj   -c C:\Users\yakov\CLionProjects\Tokenizer\main.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=C:\Users\yakov\Desktop\ProgrammingLanguages-Tokenizer\cmake-build-debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/Tokenizer.dir/main.c.obj"
+	C:\MinGW\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles\Tokenizer.dir\main.c.obj   -c C:\Users\yakov\Desktop\ProgrammingLanguages-Tokenizer\main.c
 
 CMakeFiles/Tokenizer.dir/main.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/Tokenizer.dir/main.c.i"
-	C:\MinGW\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E C:\Users\yakov\CLionProjects\Tokenizer\main.c > CMakeFiles\Tokenizer.dir\main.c.i
+	C:\MinGW\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E C:\Users\yakov\Desktop\ProgrammingLanguages-Tokenizer\main.c > CMakeFiles\Tokenizer.dir\main.c.i
 
 CMakeFiles/Tokenizer.dir/main.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/Tokenizer.dir/main.c.s"
-	C:\MinGW\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S C:\Users\yakov\CLionProjects\Tokenizer\main.c -o CMakeFiles\Tokenizer.dir\main.c.s
+	C:\MinGW\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S C:\Users\yakov\Desktop\ProgrammingLanguages-Tokenizer\main.c -o CMakeFiles\Tokenizer.dir\main.c.s
 
 CMakeFiles/Tokenizer.dir/main.c.obj.requires:
 
@@ -82,16 +82,16 @@ CMakeFiles/Tokenizer.dir/main.c.obj.provides.build: CMakeFiles/Tokenizer.dir/mai
 
 CMakeFiles/Tokenizer.dir/Tokenizer.c.obj: CMakeFiles/Tokenizer.dir/flags.make
 CMakeFiles/Tokenizer.dir/Tokenizer.c.obj: ../Tokenizer.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=C:\Users\yakov\CLionProjects\Tokenizer\cmake-build-debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/Tokenizer.dir/Tokenizer.c.obj"
-	C:\MinGW\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles\Tokenizer.dir\Tokenizer.c.obj   -c C:\Users\yakov\CLionProjects\Tokenizer\Tokenizer.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=C:\Users\yakov\Desktop\ProgrammingLanguages-Tokenizer\cmake-build-debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/Tokenizer.dir/Tokenizer.c.obj"
+	C:\MinGW\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles\Tokenizer.dir\Tokenizer.c.obj   -c C:\Users\yakov\Desktop\ProgrammingLanguages-Tokenizer\Tokenizer.c
 
 CMakeFiles/Tokenizer.dir/Tokenizer.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/Tokenizer.dir/Tokenizer.c.i"
-	C:\MinGW\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E C:\Users\yakov\CLionProjects\Tokenizer\Tokenizer.c > CMakeFiles\Tokenizer.dir\Tokenizer.c.i
+	C:\MinGW\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E C:\Users\yakov\Desktop\ProgrammingLanguages-Tokenizer\Tokenizer.c > CMakeFiles\Tokenizer.dir\Tokenizer.c.i
 
 CMakeFiles/Tokenizer.dir/Tokenizer.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/Tokenizer.dir/Tokenizer.c.s"
-	C:\MinGW\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S C:\Users\yakov\CLionProjects\Tokenizer\Tokenizer.c -o CMakeFiles\Tokenizer.dir\Tokenizer.c.s
+	C:\MinGW\bin\gcc.exe $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S C:\Users\yakov\Desktop\ProgrammingLanguages-Tokenizer\Tokenizer.c -o CMakeFiles\Tokenizer.dir\Tokenizer.c.s
 
 CMakeFiles/Tokenizer.dir/Tokenizer.c.obj.requires:
 
@@ -118,7 +118,7 @@ Tokenizer.exe: CMakeFiles/Tokenizer.dir/build.make
 Tokenizer.exe: CMakeFiles/Tokenizer.dir/linklibs.rsp
 Tokenizer.exe: CMakeFiles/Tokenizer.dir/objects1.rsp
 Tokenizer.exe: CMakeFiles/Tokenizer.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=C:\Users\yakov\CLionProjects\Tokenizer\cmake-build-debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking C executable Tokenizer.exe"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=C:\Users\yakov\Desktop\ProgrammingLanguages-Tokenizer\cmake-build-debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking C executable Tokenizer.exe"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles\Tokenizer.dir\link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -136,6 +136,6 @@ CMakeFiles/Tokenizer.dir/clean:
 .PHONY : CMakeFiles/Tokenizer.dir/clean
 
 CMakeFiles/Tokenizer.dir/depend:
-	$(CMAKE_COMMAND) -E cmake_depends "MinGW Makefiles" C:\Users\yakov\CLionProjects\Tokenizer C:\Users\yakov\CLionProjects\Tokenizer C:\Users\yakov\CLionProjects\Tokenizer\cmake-build-debug C:\Users\yakov\CLionProjects\Tokenizer\cmake-build-debug C:\Users\yakov\CLionProjects\Tokenizer\cmake-build-debug\CMakeFiles\Tokenizer.dir\DependInfo.cmake --color=$(COLOR)
+	$(CMAKE_COMMAND) -E cmake_depends "MinGW Makefiles" C:\Users\yakov\Desktop\ProgrammingLanguages-Tokenizer C:\Users\yakov\Desktop\ProgrammingLanguages-Tokenizer C:\Users\yakov\Desktop\ProgrammingLanguages-Tokenizer\cmake-build-debug C:\Users\yakov\Desktop\ProgrammingLanguages-Tokenizer\cmake-build-debug C:\Users\yakov\Desktop\ProgrammingLanguages-Tokenizer\cmake-build-debug\CMakeFiles\Tokenizer.dir\DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/Tokenizer.dir/depend
 

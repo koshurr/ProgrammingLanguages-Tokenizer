@@ -4,8 +4,8 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_C
-  "C:/Users/yakov/CLionProjects/Tokenizer/Tokenizer.c" "C:/Users/yakov/CLionProjects/Tokenizer/cmake-build-debug/CMakeFiles/Tokenizer.dir/Tokenizer.c.obj"
-  "C:/Users/yakov/CLionProjects/Tokenizer/main.c" "C:/Users/yakov/CLionProjects/Tokenizer/cmake-build-debug/CMakeFiles/Tokenizer.dir/main.c.obj"
+  "C:/Users/yakov/Desktop/ProgrammingLanguages-Tokenizer/Tokenizer.c" "C:/Users/yakov/Desktop/ProgrammingLanguages-Tokenizer/cmake-build-debug/CMakeFiles/Tokenizer.dir/Tokenizer.c.obj"
+  "C:/Users/yakov/Desktop/ProgrammingLanguages-Tokenizer/main.c" "C:/Users/yakov/Desktop/ProgrammingLanguages-Tokenizer/cmake-build-debug/CMakeFiles/Tokenizer.dir/main.c.obj"
   )
 set(CMAKE_C_COMPILER_ID "GNU")
 

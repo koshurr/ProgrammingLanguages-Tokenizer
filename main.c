@@ -96,13 +96,13 @@ char *readFile(char *fileName) {
     return code;
 }
 
-int main(){
+int main(int argc, char *argv[]){
     numOfTokens = 0;
     Token T;
     Program program;
     tokens = malloc(10000);
     //long input_file_size;
-    file = readFile("C://users//yakov//clionprojects//tokenizer//test.txt");
+    file = readFile(argv[1]);
 
     symbolTable.hashTable = (HashTable*)malloc(10 * sizeof(HashTable));
     symbolTable.noOfElem = 0;

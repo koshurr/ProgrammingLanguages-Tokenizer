@@ -6,7 +6,7 @@
 
 #IncludeRegexTransform: 
 
-C:/Users/yakov/CLionProjects/Tokenizer/Tokenizer.c
+C:/Users/yakov/Desktop/ProgrammingLanguages-Tokenizer/Tokenizer.c
 io.h
 -
 stdio.h
@@ -18,11 +18,11 @@ windef.h
 stdbool.h
 -
 Tokenizer.h
-C:/Users/yakov/CLionProjects/Tokenizer/Tokenizer.h
+C:/Users/yakov/Desktop/ProgrammingLanguages-Tokenizer/Tokenizer.h
 
-C:/Users/yakov/CLionProjects/Tokenizer/Tokenizer.h
+C:/Users/yakov/Desktop/ProgrammingLanguages-Tokenizer/Tokenizer.h
 
-C:/Users/yakov/CLionProjects/Tokenizer/main.c
+C:/Users/yakov/Desktop/ProgrammingLanguages-Tokenizer/main.c
 stdio.h
 -
 malloc.h
@@ -34,11 +34,11 @@ string.h
 io.h
 -
 Tokenizer.h
-C:/Users/yakov/CLionProjects/Tokenizer/Tokenizer.h
+C:/Users/yakov/Desktop/ProgrammingLanguages-Tokenizer/Tokenizer.h
 parseTree.h
-C:/Users/yakov/CLionProjects/Tokenizer/parseTree.h
+C:/Users/yakov/Desktop/ProgrammingLanguages-Tokenizer/parseTree.h
 
-C:/Users/yakov/CLionProjects/Tokenizer/parseTree.h
+C:/Users/yakov/Desktop/ProgrammingLanguages-Tokenizer/parseTree.h
 Tokenizer.h
-C:/Users/yakov/CLionProjects/Tokenizer/Tokenizer.h
+C:/Users/yakov/Desktop/ProgrammingLanguages-Tokenizer/Tokenizer.h
 
